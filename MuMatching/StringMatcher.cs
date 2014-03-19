@@ -9,7 +9,7 @@ namespace MuMatching
     /// <summary>
     /// 抽象的字符串模式匹配器。
     /// </summary>
-    public abstract class StringMatcher : IStringMatcher
+    public abstract class StringMatcher : IStringMatcher, ITextReaderMatcher
     {
         #region Abstract Members
 
@@ -28,14 +28,6 @@ namespace MuMatching
         #region IStringMatcher Members
 
         /// <inheritdoc />
-        public IEnumerable<StringMatchHit> Execute(TextReader source)
-        {
-            Contract.Requires<ArgumentNullException>(source != null);
-
-            return ExecuteCore(source);
-        }
-
-        /// <inheritdoc />
         public IEnumerable<StringMatchHit> Execute(string source, int startIndex, int count)
         {
             Contract.Requires<ArgumentNullException>(source != null);
@@ -45,6 +37,18 @@ namespace MuMatching
             if (source.Length == 0 || count == 0) { return Enumerable.Empty<StringMatchHit>(); }
 
             return ExecuteCore(source, startIndex, count);
+        }
+
+        #endregion
+
+        #region ITextReaderMatcher Members
+
+        /// <inheritdoc />
+        public IEnumerable<StringMatchHit> Execute(TextReader source)
+        {
+            Contract.Requires<ArgumentNullException>(source != null);
+
+            return ExecuteCore(source);
         }
 
         #endregion

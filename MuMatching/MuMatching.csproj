@@ -40,7 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IAsyncEnumerator.cs" />
+    <Compile Include="IAsyncTextReaderMatcher.cs" />
     <Compile Include="IStringMatcher.cs" />
+    <Compile Include="ITextReaderMatcher.cs" />
     <Compile Include="StringMatcher.cs" />
     <Compile Include="StringMatchHit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

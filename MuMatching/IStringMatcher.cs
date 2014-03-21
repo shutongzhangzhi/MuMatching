@@ -5,7 +5,7 @@ using System.IO;
 namespace MuMatching
 {
     /// <summary>
-    /// 以<see cref="System.String"/>作为输入源的字符串模式匹配器。
+    /// 支持对<see cref="System.String"/>进行字符串模式匹配的功能。
     /// </summary>
     /// <remarks>
     /// <see cref="IStringMatcher"/>以<see cref="System.String"/>作为输入源，并从输入中指定位置开始匹配目标模式串，
@@ -21,5 +21,6 @@ namespace MuMatching
         /// <param name="count">匹配的字符数量。</param>
         /// <returns>命中的模式列表。</returns>
         IEnumerable<StringMatchHit> Execute(string source, int startIndex, int count);
+
     }
 }

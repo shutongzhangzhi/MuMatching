@@ -40,7 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IAsyncEnumerable.cs" />
     <Compile Include="IAsyncEnumerator.cs" />
+    <Compile Include="IAsyncStringMatcher.cs" />
     <Compile Include="IAsyncTextReaderMatcher.cs" />
     <Compile Include="IStringMatcher.cs" />
     <Compile Include="ITextReaderMatcher.cs" />
@@ -48,6 +50,7 @@
     <Compile Include="StringMatchHit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

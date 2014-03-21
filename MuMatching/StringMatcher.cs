@@ -7,7 +7,7 @@ using System.Linq;
 namespace MuMatching
 {
     /// <summary>
-    /// 抽象的字符串模式匹配器。
+    /// 字符串模式匹配器基类。
     /// </summary>
     public abstract class StringMatcher : IStringMatcher, ITextReaderMatcher
     {

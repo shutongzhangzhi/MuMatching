@@ -9,7 +9,6 @@
 
         public StringMatchHit(int index, string target, string parttern)
             : this() {
-
             _index = index;
             _target = target;
             _parttern = parttern;

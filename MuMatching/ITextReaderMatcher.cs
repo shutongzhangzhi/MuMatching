@@ -4,7 +4,7 @@ using System.IO;
 namespace MuMatching
 {
     /// <summary>
-    /// 以<see cref="System.IO.TextReader"/>作为输入源的字符串模式匹配器。
+    /// 支持对<see cref="System.IO.TextReader"/>进行字符串模式匹配的功能。
     /// </summary>
     /// <remarks>
     /// <see cref="ITextReaderMatcher"/>从<see cref="System.IO.TextReader"/>中读取字符序列，并从

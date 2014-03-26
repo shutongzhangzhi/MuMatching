@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Contracts;
 
-namespace MuMatching.WM {
+namespace MuMatching.WuManber
+{
     /// <summary>
     /// 代表某字符串的子串。
     /// </summary>

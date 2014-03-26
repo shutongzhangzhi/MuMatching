@@ -4,9 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace MuMatching.WM
+namespace MuMatching.WuManber
 {
-    internal sealed class WmInternalStateBuilder {
+    internal sealed class WMInternalStateBuilder
+    {
         private const int DEFAULT_BLOCK_LENGTH = 2;
         
 

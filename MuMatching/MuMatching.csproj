@@ -51,10 +51,10 @@
     <Compile Include="StringMatcher.cs" />
     <Compile Include="StringMatchHit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WM\Substring.cs" />
-    <Compile Include="WM\WmInternalState.cs" />
-    <Compile Include="WM\WmInternalStateBuilder.cs" />
-    <Compile Include="WM\WmStringMatcher.cs" />
+    <Compile Include="WuManber\Substring.cs" />
+    <Compile Include="WuManber\WMInternalState.cs" />
+    <Compile Include="WuManber\WMInternalStateBuilder.cs" />
+    <Compile Include="WuManber\WMStringMatcher.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

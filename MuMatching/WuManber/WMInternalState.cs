@@ -1,10 +1,10 @@
-using PrefixDict = System.Collections.Generic.Dictionary<MuMatching.WM.Substring, System.Collections.Generic.List<string>>;
-using ShiftTable = System.Collections.Generic.Dictionary<MuMatching.WM.Substring, int>;
+using PrefixDict = System.Collections.Generic.Dictionary<MuMatching.WuManber.Substring, System.Collections.Generic.List<string>>;
+using ShiftTable = System.Collections.Generic.Dictionary<MuMatching.WuManber.Substring, int>;
 
-namespace MuMatching.WM
+namespace MuMatching.WuManber
 {
     // WM算法的内部状态数据表示
-    internal sealed class WmInternalState {
+    internal sealed class WMInternalState {
 
         internal const int PREFIX_TABLE_INDEX_MASK = unchecked((int)0x80000000);    // 前缀表索引掩码
         internal readonly int                   PrefixLength;       // 前缀长度
@@ -30,7 +30,7 @@ namespace MuMatching.WM
          * 
          */
 
-        public WmInternalState(
+        public WMInternalState(
             int prefixLength, int blockLength, PrefixDict[] prefixTable, ShiftTable shiftTable, int minPatternLength)
         {
             PrefixLength = prefixLength;

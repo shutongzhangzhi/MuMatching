@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace MuMatching.WM
+namespace MuMatching.WuManber
 {
-    public sealed class WmStringMatcher : StringMatcher
+    public sealed class WMStringMatcher : StringMatcher
     {
         internal void Initialize()
         {

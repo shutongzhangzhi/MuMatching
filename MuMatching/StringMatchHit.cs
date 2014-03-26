@@ -5,13 +5,13 @@
     public struct StringMatchHit {
         private readonly int _index;
         private readonly string _target;
-        private readonly string _parttern;
+        private readonly string _pattern;
 
-        public StringMatchHit(int index, string target, string parttern)
+        public StringMatchHit(int index, string target, string pattern)
             : this() {
             _index = index;
             _target = target;
-            _parttern = parttern;
+            _pattern = pattern;
         }
 
         /// <summary>
@@ -27,6 +27,6 @@
         /// <summary>
         /// 命中的模式串。
         /// </summary>
-        public string Parttern { get { return _parttern; } }
+        public string Pattern { get { return _pattern; } }
     }
 }

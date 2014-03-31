@@ -49,7 +49,7 @@
     <Compile Include="AssertExt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WuManber\SubstringTest.cs" />
-    <Compile Include="WuManber\WMInternalStateBuilderTest.cs" />
+    <Compile Include="WuManber\WuManberInternalStateBuilderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

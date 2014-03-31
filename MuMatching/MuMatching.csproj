@@ -53,9 +53,9 @@
     <Compile Include="StringMatchHit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WuManber\Substring.cs" />
-    <Compile Include="WuManber\WMInternalState.cs" />
-    <Compile Include="WuManber\WMInternalStateBuilder.cs" />
-    <Compile Include="WuManber\WMStringMatcher.cs" />
+    <Compile Include="WuManber\WuManberInternalState.cs" />
+    <Compile Include="WuManber\WuManberInternalStateBuilder.cs" />
+    <Compile Include="WuManber\WuManberStringMatcher.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

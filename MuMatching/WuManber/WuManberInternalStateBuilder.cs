@@ -12,7 +12,7 @@ namespace MuMatching.WuManber {
         private int _prefixLength;
         private int _maxSubStartIndex;
         private Dictionary<Substring, int> _shiftTable;
-
+        private List<Dictionary<Substring, List<string>>> _prefixTables;
 
         #region Initizlize
 
@@ -24,6 +24,7 @@ namespace MuMatching.WuManber {
             _prefixLength = _blockLength;
             _maxSubStartIndex = _minPatternLength - _blockLength;
             _shiftTable = new Dictionary<Substring, int>();
+            _prefixTables = new List<Dictionary<Substring, List<string>>>();
         }
 
         #endregion
@@ -62,52 +63,62 @@ namespace MuMatching.WuManber {
                  * 
                  */
                 var block = Substring.Create(pattern, start, _blockLength);
-                var span = _maxSubStartIndex - start;
-                int minSpan;
+                var distance = _maxSubStartIndex - start;
+                int minDistance;
 
-                if (!_shiftTable.TryGetValue(block, out minSpan) || span < minSpan) {
-                    _shiftTable[block] = span;
+                if (!_shiftTable.TryGetValue(block, out minDistance) || distance < minDistance) {
+                    _shiftTable[block] = distance;
                 }
 
-                //if (span == 0) {
-                //    var prefix = Substring.Create(pattern, 0, _prefixLength);
-                //    int prefixTableIndex;
 
-                //    if ((minSpan & WMInternalState.PREFIX_TABLE_MASK) == WMInternalState.PREFIX_TABLE_MASK) {
-                //        prefixTableIndex = minSpan & WMInternalState.PREFIX_TABLE_UNMASK;
-                //    }
-                //    else {
-                //        prefixTableIndex = CreatePrefixTable();
-                //        _shiftTable[block] = prefixTableIndex | WMInternalState.PREFIX_TABLE_MASK;
-                //    }
+                /*
+                 * 当字符块n值为0时将当前模式的前几个字符与当前模式加入
+                 * 字符块的前缀关系表中，最后把字符块的shift值n更新为前
+                 * 缀关系表的索引。
+                 * 
+                 */
+                if (distance == 0) {
+                    var prefix = Substring.Create(pattern, 0, _prefixLength);
+                    int prefixTableIndex;
 
-                //    AddPrefix(prefixTableIndex, prefix, pattern);
-                //}
+                    if (minDistance < 0) {
+                        // 当前字符块已经存在前缀表直接取出表索引
+                        prefixTableIndex = WuManberInternalState.UnmaskPrefixTableIndex(minDistance);
+                    }
+                    else {
+
+                        // 创建前缀关系表并更新字符块shift值
+                        prefixTableIndex = CreatePrefixTable();
+                        _shiftTable[block] = WuManberInternalState.MaskPrefixTableIndex(prefixTableIndex);
+                    }
+
+                    AddPrefix(prefixTableIndex, prefix, pattern);
+                }
             }
         }
 
-        private static int CreatePrefixTableIndex(int prefixTableIndex) {
-            return prefixTableIndex | WuManberInternalState.PREFIX_TABLE_MASK;
-        }
+        private void AddPrefix(int prefixTableIndex, Substring prefix, string pattern) {
 
-        private void AddPrefix(int prefixTableIndex, string prefix, string pattern) {
-            throw new NotImplementedException();
+            var prefixTable = _prefixTables[prefixTableIndex];
+            List<string> patterns;
+
+            if (prefixTable.TryGetValue(prefix, out patterns)) {
+                patterns.Add(pattern);
+            }
+            else {
+                prefixTable[prefix] = new List<string> { pattern };
+            }
         }
 
         private int CreatePrefixTable() {
-            throw new NotImplementedException();
+            _prefixTables.Add(new Dictionary<Substring, List<string>>());
+            return _prefixTables.Count - 1;
         }
-
-        private int GetPrefixTableIndex(int minSpan) {
-            throw new NotImplementedException();
-        }
-
-
 
 
         internal WuManberInternalState Build() {
             return new WuManberInternalState(
-                _prefixLength, _blockLength, new Dictionary<Substring, List<string>>[0],
+                _prefixLength, _blockLength, _prefixTables.ToArray(),
                 _shiftTable, _minPatternLength);
         }
     }

@@ -10,7 +10,7 @@ namespace MuMatching.WuManber
         internal const int PREFIX_TABLE_UNMASK = ~PREFIX_TABLE_MASK;    
         internal readonly int                   PrefixLength;       // 前缀长度
         internal readonly int                   BlockLength;        // 字符块长度
-        internal readonly PrefixDict[]          PrefixTable;        // 字符块前缀表
+        internal readonly PrefixDict[]          PrefixTables;       // 字符块前缀表
         internal readonly ShiftTable            ShiftTable;         // 跳跃表
         internal readonly int                   MinPatternLength;   // 最小模式串长度
 
@@ -27,7 +27,7 @@ namespace MuMatching.WuManber
          *      if( (value & PREFIX_TABLE_INDEX_MASK) != PREFIX_TABLE_INDEX_MASK) {
          *          currentIndex += value;
          *      } else {
-         *          var prefixDict = PrefixTable[value & 0x7FFFFFFF];
+         *          var prefixDict = PrefixTables[value & 0x7FFFFFFF];
          *          ...
          *          ...
          *      }
@@ -35,15 +35,27 @@ namespace MuMatching.WuManber
          */
 
         public WuManberInternalState(
-            int prefixLength, int blockLength, PrefixDict[] prefixTable, ShiftTable shiftTable, int minPatternLength)
+            int prefixLength, int blockLength, PrefixDict[] prefixTables, ShiftTable shiftTable, int minPatternLength)
         {
             PrefixLength        = prefixLength;
             BlockLength         = blockLength;
-            PrefixTable         = prefixTable;
+            PrefixTables         = prefixTables;
             ShiftTable          = shiftTable;
             MinPatternLength    = minPatternLength;
         }
 
+
+        internal PrefixDict GetPrefixTable(int prefixTableIndex) {
+            return PrefixTables[prefixTableIndex & PREFIX_TABLE_UNMASK];
+        }
+
+        internal static int UnmaskPrefixTableIndex(int maskPrefixTableIdx) {
+            return maskPrefixTableIdx & PREFIX_TABLE_UNMASK;
+        }
+
+        internal static int MaskPrefixTableIndex(int prefixTableIdx) {
+            return prefixTableIdx | PREFIX_TABLE_MASK;
+        }
     }
 
 

@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 namespace MuMatching.WuManber
 {
     /// <summary>
-    /// 代表某字符串的子串。
+    /// 代表某目标字符串的子串。
     /// </summary>
     internal struct Substring : IEquatable<Substring> {
 
@@ -29,7 +29,7 @@ namespace MuMatching.WuManber
 
         public unsafe override int GetHashCode() {
 
-            const int seed  = 131;
+            const int SEED  = 131;
             var hash = 0;
 
             fixed (char* p_char = Target) {
@@ -38,7 +38,7 @@ namespace MuMatching.WuManber
                 char* p_target_end      = p_target_start + Length;
 
                 while (p_target_start < p_target_end) {
-                    hash = hash * seed + *p_target_start++;
+                    hash = hash * SEED + *p_target_start++;
                 }
             }
 
@@ -55,10 +55,6 @@ namespace MuMatching.WuManber
 
         #endregion
 
-        internal static Substring Create(string target, int startIndex, int length) {
-            return new Substring(target, startIndex, length);
-        }
-
         #region IEquatable<Substring> Members
         public bool Equals(Substring other) {
 
@@ -67,6 +63,14 @@ namespace MuMatching.WuManber
                 Target, StartIndex, other.Target, other.StartIndex, Length) == 0;
         }
         #endregion
+
+        internal static Substring Create(string target, int startIndex, int length) {
+            return new Substring(target, startIndex, length);
+        }
+
+        internal static Substring Create(string target) {
+            return new Substring(target, 0, target.Length);
+        }
     }
 }
 

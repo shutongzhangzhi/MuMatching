@@ -51,6 +51,7 @@ namespace MuMatching.WuManber
             if (obj.GetType() != typeof(Substring)) { return false; }
             return Equals((Substring)obj);
         }
+
         public override string ToString() { return Target.Substring(StartIndex, Length); }
 
         #endregion

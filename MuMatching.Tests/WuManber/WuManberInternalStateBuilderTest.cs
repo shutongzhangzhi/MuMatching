@@ -7,17 +7,15 @@ using Xunit;
 
 namespace MuMatching.Tests.WuManber {
     public class WuManberInternalStateBuilderTest {
-        private WuManberInternalStateBuilder _builder;
 
         public WuManberInternalStateBuilderTest() {
-            _builder = new WuManberInternalStateBuilder();
         }
 
         [Fact]
         public void Build_Test() {
 
             // Arrange
-            var patterns = new string[] { "abcde", "bcbde", "adcabe" };
+            var patterns = new string[] { "abcdef", "decabf", "eecab", "abbde" };
             var builder = new WuManberInternalStateBuilder(patterns);
             
 
@@ -26,17 +24,17 @@ namespace MuMatching.Tests.WuManber {
             var state = builder.Build();
 
             // Assert
-            Assert.Equal(5, state.MinPatternLength);
-            Assert.Equal(2, state.BlockLength);
-            Assert.Equal(2, state.PrefixLength);
+            Assert.Equal(5, state.LengthInfo.MinPatternLength);
+            Assert.Equal(2, state.LengthInfo.BlockLength);
+            Assert.Equal(2, state.LengthInfo.PrefixLength);
             AssertShiftTable(state.ShiftTable);
             AssertPrefixTable(state);
         }
 
         private void AssertShiftTable(Dictionary<Substring, int> shiftTable) {
             var expected = new Dictionary<string, int>{ 
-              {"bc",2}, {"cd",1}, {"cb",2}, 
-              {"bd",1}, {"ad",3}, {"dc",2}, {"ca",1}};
+                {"bc",2}, {"cd",1},{"ec",2}, 
+                {"ca",1}, {"ee",3},{"bb",2}};
             //{"ab",0},{"de",0} 
             foreach (var block in expected) {
                 Assert.Contains(new KeyValuePair<Substring, int>(
@@ -50,14 +48,17 @@ namespace MuMatching.Tests.WuManber {
            var abPrefixTable = state.GetPrefixTable(state.ShiftTable[Substring.Create("ab")]);
            var dePrefixTable = state.GetPrefixTable(state.ShiftTable[Substring.Create("de")]);
 
-            // ad*abe
-            Assert.Contains("adcabe", abPrefixTable[Substring.Create("ad")]);
+            // de*ab
+            Assert.Contains("decabf", abPrefixTable[Substring.Create("de")]);
+
+            // ee*ab
+            Assert.Contains("eecab", abPrefixTable[Substring.Create("ee")]);
 
             // ab*de
-            Assert.Contains("abcde", dePrefixTable[Substring.Create("ab")]);
+            Assert.Contains("abcdef", dePrefixTable[Substring.Create("ab")]);
 
-            // bc*de
-            Assert.Contains("bcbde", dePrefixTable[Substring.Create("bc")]);
+            // ab*de
+            Assert.Contains("abbde", dePrefixTable[Substring.Create("ab")]);
 
         }
 
@@ -75,7 +76,7 @@ namespace MuMatching.Tests.WuManber {
             var state = builder.Build();
 
             // Assert
-            Assert.Equal(minPatternLength, state.MinPatternLength);
+            Assert.Equal(minPatternLength, state.LengthInfo.MinPatternLength);
         }
 
         [Fact]
@@ -90,9 +91,20 @@ namespace MuMatching.Tests.WuManber {
             var state = builder.Build();
 
             // Assert
-            Assert.Equal(5, state.MinPatternLength);
+            Assert.Equal(5, state.LengthInfo.MinPatternLength);
 
         }
 
+
+        [Fact]
+        public void AddPatterns_When_Pattern_Length_Less_Than_MinPatternLength_Test() {
+            // Arrage
+            var builder = new WuManberInternalStateBuilder(5);
+
+            // Act/Assert
+            builder.Initialize();
+            Assert.Throws<ArgumentException>(
+                () => builder.AddPatterns(new[] {"abc"}));
+        }
     }
 }

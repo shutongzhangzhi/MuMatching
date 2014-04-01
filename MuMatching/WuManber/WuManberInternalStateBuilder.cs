@@ -31,12 +31,7 @@ namespace MuMatching.WuManber {
             _initPatterns = initPatterns;
         }
 
-        internal WuManberInternalStateBuilder()
-        {
-            // TODO: Complete member initialization
-        }
-
-        #region Initizlize
+        #region Initialize
 
         internal void Initialize() {
             
@@ -60,40 +55,33 @@ namespace MuMatching.WuManber {
             if (_initPatterns != null) { AddPatterns(_initPatterns); }
         }
 
+        #endregion
+
+        #region Private Helpers
+
         private static int GetMinPatternLength(IEnumerable<string> patterns, ref int initPatternCount) {
 
-            int minLength   = 1;
-            int count       = 0;
+            int minLength = 0;
+            int count = 0;
 
             foreach (var pattern in patterns) {
-                if (String.IsNullOrEmpty(pattern)) { continue; }
+                if (!String.IsNullOrEmpty(pattern)) {
+                    if (minLength == 0) {
+                        minLength = pattern.Length;
+                    }
 
-                if (minLength == 1) {
-                    minLength = pattern.Length;
+                    if (pattern.Length < minLength) {
+                        minLength = pattern.Length;
+                    }
+                    count++;
                 }
-                if (pattern.Length < minLength) {
-                    minLength = pattern.Length;
-                }
-                count++;
             }
 
             if (count > initPatternCount) {
                 initPatternCount = count;
             }
 
-            return minLength;
-        }
-
-        #endregion
-
-        internal void AddPatterns(IEnumerable<string> patterns) {
-            Debug.Assert(patterns != null);
-
-            foreach (var pattern in patterns) {
-                if (!String.IsNullOrEmpty(pattern)) {
-                    AddPattern(pattern);
-                }
-            }
+            return minLength == 0 ? 1 : minLength;
         }
 
         private void AddPattern(string pattern) {
@@ -149,6 +137,8 @@ namespace MuMatching.WuManber {
                  * ["ee"=3]                 |"abcdef"|
                  * ["bb"=2]                 |"abbde" |
                  *                          +--------+
+                 *                    
+                 * ab,de 实际不等于0
                  *                          
                  * 注意：这与Wu-Manber原始论文结构是有差异的
                  * 
@@ -161,7 +151,8 @@ namespace MuMatching.WuManber {
                     if (minDistance < 0) {
                         // 当前字符块已经存在前缀表直接取出表索引
                         prefixTableIndex = WuManberInternalState.UnmaskPrefixTableIndex(minDistance);
-                    } else {
+                    }
+                    else {
                         // 创建前缀关系表并更新字符块shift值
                         prefixTableIndex = CreatePrefixTable();
                         _shiftTable[block] = WuManberInternalState.MaskPrefixTableIndex(prefixTableIndex);
@@ -170,6 +161,14 @@ namespace MuMatching.WuManber {
                     AddPrefix(prefixTableIndex, prefix, pattern);
                 }
             }
+        }
+
+        private int CreatePrefixTable() {
+
+            // TODO: capacity应该可预测集合大小
+            _prefixTables.Add(new Dictionary<Substring, List<string>>());
+            return _prefixTables.Count - 1;
+
         }
 
         private void AddPrefix(int prefixTableIndex, Substring prefix, string pattern) {
@@ -185,20 +184,40 @@ namespace MuMatching.WuManber {
             }
         }
 
-        private int CreatePrefixTable() {
-           
-            // TODO: capacity应该可预测集合大小
-            _prefixTables.Add(new Dictionary<Substring, List<string>>());
-            return _prefixTables.Count - 1;
+        #endregion
 
+        #region Public APIs
+
+        /// <summary>
+        /// 向生成器添加模式列表。
+        /// </summary>
+        /// <param name="patterns">模式列表。</param>
+        internal void AddPatterns(IEnumerable<string> patterns) {
+            Debug.Assert(patterns != null);
+
+            foreach (var pattern in patterns) {
+                if (!String.IsNullOrEmpty(pattern)) {
+
+                    if (pattern.Length < _minPatternLength) {
+                        throw new ArgumentException(
+                            String.Format("pattern:{0} length less than MinPatternLength:{1}.",
+                                pattern, _minPatternLength.ToString()), "patterns");
+                    }
+
+                    AddPattern(pattern);
+                }
+            }
         }
 
-
+        /// <summary>
+        /// 生成内部状态。
+        /// </summary>
         internal WuManberInternalState Build() {
-            return new WuManberInternalState(
-                _prefixLength, _blockLength, _prefixTables.ToArray(),
-                _shiftTable, _minPatternLength);
+            return new WuManberInternalState( _prefixLength, _blockLength, _minPatternLength,
+                _prefixTables.ToArray(), _shiftTable);
         }
+
+        #endregion
 
     }
 }

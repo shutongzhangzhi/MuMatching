@@ -29,19 +29,36 @@ namespace MuMatching.Tests.WuManber {
             Assert.Equal(2, state.BlockLength);
             Assert.Equal(2, state.PrefixLength);
             AssertShiftTable(state.ShiftTable);
+            AssertPrefixTable(state);
         }
 
         private void AssertShiftTable(Dictionary<Substring, int> shiftTable) {
             var expected = new Dictionary<string, int>{ 
-             {"ab",0}, {"bc",2}, {"cd",1}, 
-             {"de",0}, {"cb",2}, {"bd",1},
-             {"ad",3}, {"dc",2}, {"ca",1}};
+              {"bc",2}, {"cd",1}, {"cb",2}, 
+              {"bd",1}, {"ad",3}, {"dc",2}, {"ca",1}};
+            //{"ab",0},{"de",0} 
+            foreach (var block in expected) {
+                Assert.Contains(new KeyValuePair<Substring, int>(
+                    Substring.Create(block.Key), block.Value),
+                    shiftTable);
+            }
+        }
 
-            var actual = shiftTable.Select(
-                kv => new KeyValuePair<string, int>(kv.Key.ToString(), kv.Value));
+        private void AssertPrefixTable(WuManberInternalState state) {
 
-            Assert.Equal(expected, actual);
+           var abPrefixTable = state.GetPrefixTable(state.ShiftTable[Substring.Create("ab")]);
+           var dePrefixTable = state.GetPrefixTable(state.ShiftTable[Substring.Create("de")]);
+
+            // ad*abe
+            Assert.Contains("adcabe", abPrefixTable[Substring.Create("ad")]);
+
+            // ab*de
+            Assert.Contains("abcde", dePrefixTable[Substring.Create("ab")]);
+
+            // bc*de
+            Assert.Contains("bcbde", dePrefixTable[Substring.Create("bc")]);
 
         }
+
     }
 }

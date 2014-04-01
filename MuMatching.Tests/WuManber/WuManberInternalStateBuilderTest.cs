@@ -18,11 +18,12 @@ namespace MuMatching.Tests.WuManber {
 
             // Arrange
             var patterns = new string[] { "abcde", "bcbde", "adcabe" };
-            _builder.Initialize(5);
+            var builder = new WuManberInternalStateBuilder(patterns);
+            
 
             // Act
-            _builder.AddPatterns(patterns);
-            var state = _builder.Build();
+            builder.Initialize();
+            var state = builder.Build();
 
             // Assert
             Assert.Equal(5, state.MinPatternLength);
@@ -57,6 +58,39 @@ namespace MuMatching.Tests.WuManber {
 
             // bc*de
             Assert.Contains("bcbde", dePrefixTable[Substring.Create("bc")]);
+
+        }
+
+
+
+        [Fact]
+        public void Constructor_Of_MinPatternLength_Test() {
+            
+            // Arrange
+            var minPatternLength = 1;
+            var builder = new WuManberInternalStateBuilder(minPatternLength);
+
+            // Act
+            builder.Initialize();
+            var state = builder.Build();
+
+            // Assert
+            Assert.Equal(minPatternLength, state.MinPatternLength);
+        }
+
+        [Fact]
+        public void Constructor_Of_Patterns_Test() {
+
+            // Arrange
+            var patterns = new string[] { "abcde", "bcbde", "adcabe" };
+            var builder = new WuManberInternalStateBuilder(patterns);
+
+            // Act
+            builder.Initialize();
+            var state = builder.Build();
+
+            // Assert
+            Assert.Equal(5, state.MinPatternLength);
 
         }
 

@@ -5,30 +5,88 @@ using System.Linq;
 using System.Text;
 
 namespace MuMatching.WuManber {
+
     internal sealed class WuManberInternalStateBuilder {
+
         private const int DEFAULT_BLOCK_LENGTH = 2;
-        private int _minPatternLength;
-        private int _blockLength;
-        private int _prefixLength;
-        private int _maxSubStartIndex;
-        private Dictionary<Substring, int> _shiftTable;
-        private List<Dictionary<Substring, List<string>>> _prefixTables;
+        private readonly IEnumerable<string>                    _initPatterns;
+        private int                                             _minPatternLength;
+        private int                                             _blockLength;
+        private int                                             _prefixLength;
+        private int                                             _maxSubStartIndex;
+        private Dictionary<Substring, int>                      _shiftTable;
+        private List<Dictionary<Substring, List<string>>>       _prefixTables;
 
-        #region Initizlize
-
-        public void Initialize(int minPatternLength) {
+        internal WuManberInternalStateBuilder(int minPatternLength)
+        {
             Debug.Assert(minPatternLength > 0);
 
             _minPatternLength = minPatternLength;
-            _blockLength = Math.Min(DEFAULT_BLOCK_LENGTH, minPatternLength);
-            _prefixLength = _blockLength;
-            _maxSubStartIndex = _minPatternLength - _blockLength;
-            _shiftTable = new Dictionary<Substring, int>();
-            _prefixTables = new List<Dictionary<Substring, List<string>>>();
+        }
+
+        internal WuManberInternalStateBuilder(IEnumerable<string> initPatterns)
+        {
+            Debug.Assert(initPatterns != null);
+
+            _initPatterns = initPatterns;
+        }
+
+        internal WuManberInternalStateBuilder()
+        {
+            // TODO: Complete member initialization
+        }
+
+        #region Initizlize
+
+        internal void Initialize() {
+            
+            int patternsCount   = 16;
+            if (_minPatternLength == 0) {
+                // 从初始模式列表中获得最小模式长度
+                _minPatternLength = GetMinPatternLength(_initPatterns, ref patternsCount);
+            }
+
+            _blockLength            = Math.Min(DEFAULT_BLOCK_LENGTH, _minPatternLength);
+            _prefixLength           = _blockLength;
+            _maxSubStartIndex       = _minPatternLength - _blockLength;
+
+            // 根据模式规模大小初始化ShiftTable 和PrefixTables
+            const float FORECAST_RATIO  = 1.0F;  // 根据一定样本测试得出，可能并不适用任何情况
+            var capacity            = (int) ((_minPatternLength - _blockLength + 1) * patternsCount * FORECAST_RATIO);
+            _shiftTable             = new Dictionary<Substring, int>(capacity);
+            _prefixTables           = new List<Dictionary<Substring, List<string>>>(capacity);
+
+            // 添加初始模式列表
+            if (_initPatterns != null) { AddPatterns(_initPatterns); }
+        }
+
+        private static int GetMinPatternLength(IEnumerable<string> patterns, ref int initPatternCount) {
+
+            int minLength   = 1;
+            int count       = 0;
+
+            foreach (var pattern in patterns) {
+                if (String.IsNullOrEmpty(pattern)) { continue; }
+
+                if (minLength == 1) {
+                    minLength = pattern.Length;
+                }
+                if (pattern.Length < minLength) {
+                    minLength = pattern.Length;
+                }
+                count++;
+            }
+
+            if (count > initPatternCount) {
+                initPatternCount = count;
+            }
+
+            return minLength;
         }
 
         #endregion
-        public void AddPatterns(IEnumerable<string> patterns) {
+
+        internal void AddPatterns(IEnumerable<string> patterns) {
             Debug.Assert(patterns != null);
 
             foreach (var pattern in patterns) {
@@ -70,23 +128,40 @@ namespace MuMatching.WuManber {
                     _shiftTable[block] = distance;
                 }
 
-
                 /*
                  * 当字符块n值为0时将当前模式的前几个字符与当前模式加入
                  * 字符块的前缀关系表中，最后把字符块的shift值n更新为前
                  * 缀关系表的索引。
                  * 
+                 * 假设现有模式串列表：
+                 * ["abcdef", "decabf", "eecab", "abbde"] 且m=5, b=2，那么生成数据结构如：
+                 * 
+                 * -------------+------------------------
+                 *  ShiftTable  | PrefixTables            
+                 * -------------+------------------------
+                 *              +----+      +--------+
+                 * ["ab"=0]---->|"de"|----->|"decabf"|
+                 * ["bc"=2]     |"ee"|--\   +--------+
+                 * ["cd"=1]     +----+   \->+--------+
+                 * ["de"=0]---->+----+      |"eecab" |
+                 * ["ec"=2]     |"ab"|--\   +--------+
+                 * ["ca"=1]     +----+   \->+--------+
+                 * ["ee"=3]                 |"abcdef"|
+                 * ["bb"=2]                 |"abbde" |
+                 *                          +--------+
+                 *                          
+                 * 注意：这与Wu-Manber原始论文结构是有差异的
+                 * 
                  */
                 if (distance == 0) {
+
                     var prefix = Substring.Create(pattern, 0, _prefixLength);
                     int prefixTableIndex;
 
                     if (minDistance < 0) {
                         // 当前字符块已经存在前缀表直接取出表索引
                         prefixTableIndex = WuManberInternalState.UnmaskPrefixTableIndex(minDistance);
-                    }
-                    else {
-
+                    } else {
                         // 创建前缀关系表并更新字符块shift值
                         prefixTableIndex = CreatePrefixTable();
                         _shiftTable[block] = WuManberInternalState.MaskPrefixTableIndex(prefixTableIndex);
@@ -111,8 +186,11 @@ namespace MuMatching.WuManber {
         }
 
         private int CreatePrefixTable() {
+           
+            // TODO: capacity应该可预测集合大小
             _prefixTables.Add(new Dictionary<Substring, List<string>>());
             return _prefixTables.Count - 1;
+
         }
 
 
@@ -121,5 +199,6 @@ namespace MuMatching.WuManber {
                 _prefixLength, _blockLength, _prefixTables.ToArray(),
                 _shiftTable, _minPatternLength);
         }
+
     }
 }

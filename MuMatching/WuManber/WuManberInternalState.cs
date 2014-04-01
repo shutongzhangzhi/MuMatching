@@ -6,8 +6,8 @@ namespace MuMatching.WuManber
     // WM算法的内部状态数据表示
     internal sealed class WuManberInternalState {
 
-        internal const int PREFIX_TABLE_MASK = unchecked((int)0x80000000);    // 前缀表索引掩码
-        internal const int PREFIX_TABLE_UNMASK = ~PREFIX_TABLE_MASK;    
+        internal const int PREFIX_TABLE_MASK    = unchecked((int)0x80000000);    // 前缀表索引掩码
+        internal const int PREFIX_TABLE_UNMASK  = ~PREFIX_TABLE_MASK;    
         internal readonly int                   PrefixLength;       // 前缀长度
         internal readonly int                   BlockLength;        // 字符块长度
         internal readonly PrefixDict[]          PrefixTables;       // 字符块前缀表
@@ -39,7 +39,7 @@ namespace MuMatching.WuManber
         {
             PrefixLength        = prefixLength;
             BlockLength         = blockLength;
-            PrefixTables         = prefixTables;
+            PrefixTables        = prefixTables;
             ShiftTable          = shiftTable;
             MinPatternLength    = minPatternLength;
         }

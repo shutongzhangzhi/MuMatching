@@ -8,9 +8,6 @@ using Xunit;
 namespace MuMatching.Tests.WuManber {
     public class WuManberInternalStateBuilderTest {
 
-        public WuManberInternalStateBuilderTest() {
-        }
-
         [Fact]
         public void Build_Test() {
 

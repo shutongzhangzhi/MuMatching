@@ -35,7 +35,7 @@ namespace MuMatching.WuManber {
 
         internal void Initialize() {
             
-            int patternsCount   = 16;
+            var patternsCount       = 16;
             if (_minPatternLength == 0) {
                 // 从初始模式列表中获得最小模式长度
                 _minPatternLength = GetMinPatternLength(_initPatterns, ref patternsCount);
